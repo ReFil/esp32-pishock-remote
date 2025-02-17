@@ -116,14 +116,15 @@ void poll_analog_inputs() {
     for(int i = 0; i < 16; i++) {
         raw_power = raw_power + analogReadMilliVolts(POWER_PIN); // ADC with correction   
     }
-    raw_power = raw_power / 16;     // attenuation ratio 1/2, mV --> V
+    raw_power = raw_power / 16;     // Divide by 16 for the 16 samples
 
 
     uint32_t raw_duration = 0;
     for(int i = 0; i < 16; i++) {
         raw_duration = raw_duration + analogReadMilliVolts(DURATION_PIN); // ADC with correction   
     }
-    raw_duration = raw_duration / 16;     // attenuation ratio 1/2, mV --> V
+    raw_duration = raw_duration / 16;     // Divide by 16 for the 16 samples
+
     #ifdef REVERSE_POTS
     power = map(raw_power, POTENTIOMETER_MAX, 5, 1, POWER_MAX);
     duration = map(raw_duration, POTENTIOMETER_MAX, 5, 1, DURATION_MAX);
@@ -206,7 +207,7 @@ void send_to_api(int power, int duration, int op){
         HTTPClient http;
         http.begin(client, api_url);
     
-        
+        // Form the API request
         http.addHeader("Content-Type", "application/json");
         String httpRequestData = "{\"Username\":\"";
         httpRequestData += username;
@@ -229,6 +230,7 @@ void send_to_api(int power, int duration, int op){
         Serial.print("HTTP Request: ");
         Serial.println(httpRequestData);
         #endif
+        // Send the API request
         int httpResponseCode = http.POST(httpRequestData);
     
         if (httpResponseCode > 0) {
@@ -262,8 +264,6 @@ void setup() {
     pinMode(BUTTON_PIN, INPUT_PULLUP);
     
     
-    //Serial.println("bongus");
-
     // Fire up the wifi and connect
     WiFi.useStaticBuffers(true);
     WiFi.mode(WIFI_STA);
